@@ -47,3 +47,33 @@ def send_reminder_email(
     except Exception as e:
         logger.error("Failed to send email to %s: %s", to_email, e)
         return False
+
+
+def send_reminder_email_debug(
+    to_email: str,
+    to_name: str,
+    subject: str,
+    body_html: str,
+) -> dict:
+    """Send email and return full debug info."""
+    sg = _get_sg()
+    if not sg:
+        return {"sent": False, "error": "SendGrid not configured"}
+
+    message = Mail(
+        from_email=From("scythelb@gmail.com", "PaidUp Reminders"),
+        to_emails=To(to_email, to_name),
+        subject=Subject(subject),
+        html_content=HtmlContent(body_html),
+    )
+
+    try:
+        response = sg.send(message)
+        return {
+            "sent": 200 <= response.status_code < 300,
+            "status_code": response.status_code,
+            "body": str(response.body)[:500],
+            "headers": dict(response.headers),
+        }
+    except Exception as e:
+        return {"sent": False, "error": str(e)}

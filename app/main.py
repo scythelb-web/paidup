@@ -50,12 +50,12 @@ async def health():
 async def test_email():
     """Send a test email to verify SendGrid is configured."""
     from app.config import SENDGRID_API_KEY, ADMIN_EMAIL
-    from app.services.emailer import send_reminder_email
+    from app.services.emailer import send_reminder_email_debug
 
     if not SENDGRID_API_KEY:
         return {"status": "error", "message": "SendGrid API key not configured"}
 
-    result = send_reminder_email(
+    result = send_reminder_email_debug(
         to_email=ADMIN_EMAIL,
         to_name="PaidUp User",
         subject="PaidUp Email Test — It Works!",
@@ -64,4 +64,4 @@ async def test_email():
         <p>Your customers will now receive automated invoice follow-ups.</p>
         <p style="color:#888;font-size:12px;">Sent from PaidUp — automated invoice follow-up</p>""",
     )
-    return {"status": "ok" if result else "error", "sent": result}
+    return {"status": "ok" if result.get("sent") else "error", **result, "to": ADMIN_EMAIL}
