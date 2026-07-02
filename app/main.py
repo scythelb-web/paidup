@@ -58,7 +58,7 @@ async def test_email():
     result = send_reminder_email_debug(
         to_email=ADMIN_EMAIL,
         to_name="PaidUp User",
-        subject="PaidUp Email Test — It Works!",
+        subject="PaidUp Email Test -- It Works!",
         body_html="""<h2>Your PaidUp invoice reminders are configured!</h2>
         <p>This confirms that SendGrid is wired up and sending correctly.</p>
         <p>Your customers will now receive automated invoice follow-ups.</p>
