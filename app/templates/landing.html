@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaidUp — Automated Invoice Follow-Up for Stripe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e4e4e7; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+        nav { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; }
+        nav a { color: #a1a1aa; text-decoration: none; margin-left: 24px; font-size: 14px; }
+        nav a:hover { color: #e4e4e7; }
+        .logo { font-size: 22px; font-weight: 800; color: #22c55e; }
+        .hero { text-align: center; padding: 80px 0 60px; }
+        .hero h1 { font-size: 48px; font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+        .hero h1 span { color: #22c55e; }
+        .hero p { font-size: 18px; color: #a1a1aa; max-width: 600px; margin: 0 auto 32px; }
+        .btn { display: inline-block; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; text-decoration: none; cursor: pointer; }
+        .btn-primary { background: #22c55e; color: #0f1117; }
+        .btn-primary:hover { background: #16a34a; }
+        .btn-outline { border: 1px solid #333; color: #e4e4e7; margin-left: 12px; }
+        .btn-outline:hover { border-color: #22c55e; }
+        .features { padding: 60px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 32px; }
+        .feature { background: #1a1d27; padding: 28px; border-radius: 12px; border: 1px solid #262a36; }
+        .feature h3 { font-size: 18px; margin-bottom: 10px; color: #22c55e; }
+        .feature p { font-size: 14px; color: #a1a1aa; }
+        .how-it-works { padding: 60px 0; }
+        .how-it-works h2 { font-size: 32px; text-align: center; margin-bottom: 40px; }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+        .step { text-align: center; }
+        .step-num { width: 48px; height: 48px; background: #22c55e; color: #0f1117; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; margin: 0 auto 12px; }
+        .step h4 { font-size: 16px; margin-bottom: 6px; }
+        .step p { font-size: 13px; color: #a1a1aa; }
+        .pricing { text-align: center; padding: 60px 0; }
+        .pricing h2 { font-size: 32px; margin-bottom: 12px; }
+        .pricing .sub { color: #a1a1aa; margin-bottom: 32px; }
+        .price-card { background: #1a1d27; border: 1px solid #22c55e; border-radius: 12px; padding: 40px; max-width: 400px; margin: 0 auto; }
+        .price { font-size: 48px; font-weight: 800; }
+        .price small { font-size: 16px; color: #a1a1aa; font-weight: 400; }
+        .price-card ul { list-style: none; margin: 24px 0; text-align: left; }
+        .price-card li { padding: 8px 0; font-size: 14px; }
+        .price-card li::before { content: "✓ "; color: #22c55e; font-weight: bold; }
+        footer { text-align: center; padding: 40px 0; color: #52525b; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="logo">PaidUp</div>
+            <div>
+                <a href="/auth/login">Login</a>
+                <a href="/auth/signup" style="color:#22c55e;font-weight:600;">Sign Up Free</a>
+            </div>
+        </nav>
+
+        <div class="hero">
+            <h1>Never <span>chase an invoice</span> again.</h1>
+            <p>PaidUp watches your Stripe invoices and automatically sends the right follow-up at the right time — so you get paid without the awkward emails.</p>
+            <a href="/auth/signup" class="btn btn-primary">Start Free — No Credit Card</a>
+            <a href="#how" class="btn btn-outline">How It Works</a>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>🔌 One-Click Stripe Connect</h3>
+                <p>Paste your Stripe API key. Done. PaidUp watches your invoices automatically — no manual uploads, no PDFs.</p>
+            </div>
+            <div class="feature">
+                <h3>📧 Smart Sequences</h3>
+                <p>Friendly nudge → gentle reminder → firm follow-up → final notice. Escalates at the right pace so you never sound pushy.</p>
+            </div>
+            <div class="feature">
+                <h3>🛑 Auto-Stops When Paid</h3>
+                <p>The moment a customer pays, PaidUp stops — no awkward "please disregard" emails. Your customers never feel harassed.</p>
+            </div>
+            <div class="feature">
+                <h3>📊 Real-Time Dashboard</h3>
+                <p>See every outstanding invoice, how many reminders went out, and how much you've collected — all in one place.</p>
+            </div>
+            <div class="feature">
+                <h3>✉️ Professional Templates</h3>
+                <p>Pre-written, tested email copy that gets results. Customizable with your business name and branding.</p>
+            </div>
+            <div class="feature">
+                <h3>🔒 Zero Client Interaction</h3>
+                <p>You never have to write another "just checking in" email. PaidUp handles it silently in the background.</p>
+            </div>
+        </div>
+
+        <div class="how-it-works" id="how">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h4>Connect Stripe</h4>
+                    <p>Paste your Stripe API key. Takes 30 seconds.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h4>We Watch</h4>
+                    <p>PaidUp monitors your invoices. When one goes unpaid past its due date, the sequence starts.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h4>Get Paid</h4>
+                    <p>Your customers get professional, escalating reminders. You get paid — without lifting a finger.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pricing">
+            <h2>Simple Pricing</h2>
+            <p class="sub">One plan. Everything included.</p>
+            <div class="price-card">
+                <div class="price">$19<small>/month</small></div>
+                <ul>
+                    <li>Unlimited Stripe invoices</li>
+                    <li>Full 6-step follow-up sequence</li>
+                    <li>Professional email templates</li>
+                    <li>Auto-stop when payment received</li>
+                    <li>Real-time dashboard</li>
+                    <li>Email support</li>
+                </ul>
+                <a href="/auth/signup" class="btn btn-primary">Start Free Trial</a>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2026 PaidUp. Built for people who hate chasing invoices.
+        </footer>
+    </div>
+</body>
+</html>

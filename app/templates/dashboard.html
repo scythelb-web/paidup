@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — PaidUp</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e4e4e7; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+        nav { padding: 16px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f2230; margin-bottom: 32px; }
+        nav .logo { font-size: 18px; font-weight: 800; color: #22c55e; text-decoration: none; }
+        nav .nav-right { display: flex; align-items: center; gap: 16px; font-size: 13px; }
+        nav .nav-right a { color: #a1a1aa; text-decoration: none; }
+        nav .nav-right a:hover { color: #e4e4e7; }
+        .setup-banner { background: #1a1d27; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .setup-banner p { font-size: 14px; }
+        .setup-banner a { color: #22c55e; font-weight: 600; text-decoration: none; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        .stat { background: #1a1d27; padding: 20px; border-radius: 10px; border: 1px solid #262a36; }
+        .stat .label { font-size: 12px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .stat .value { font-size: 28px; font-weight: 800; }
+        .stat .value.green { color: #22c55e; }
+        .stat .value.yellow { color: #f59e0b; }
+        .section { margin-bottom: 32px; }
+        .section h2 { font-size: 18px; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 10px 12px; color: #a1a1aa; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #1f2230; }
+        td { padding: 12px; border-bottom: 1px solid #1f2230; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .badge-overdue { background: #7f1d1d; color: #fca5a5; }
+        .badge-open { background: #1e3a5f; color: #93c5fd; }
+        .badge-collected { background: #14532d; color: #86efac; }
+        .empty { text-align: center; padding: 40px; color: #52525b; }
+        .empty p { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/" class="logo">PaidUp</a>
+            <div class="nav-right">
+                {% if not setup_complete %}
+                    <a href="/stripe/setup" style="color:#f59e0b;">⚠ Connect Stripe</a>
+                {% endif %}
+                <span>{{ user.email }}</span>
+                <a href="/auth/logout">Logout</a>
+            </div>
+        </nav>
+
+        {% if not setup_complete %}
+        <div class="setup-banner">
+            <p>⚠ <strong>Stripe not connected.</strong> PaidUp can't watch your invoices until you connect your Stripe account.</p>
+            <a href="/stripe/setup">Connect Now →</a>
+        </div>
+        {% endif %}
+
+        <div class="stats">
+            <div class="stat">
+                <div class="label">Active Overdue</div>
+                <div class="value yellow">{{ active_overdue }}</div>
+            </div>
+            <div class="stat">
+                <div class="label">Pending Invoices</div>
+                <div class="value">{{ active_open }}</div>
+            </div>
+            <div class="stat">
+                <div class="label">Collected This Month</div>
+                <div class="value green">{{ month_collected }}</div>
+            </div>
+            <div class="stat">
+                <div class="label">Revenue Recovered</div>
+                <div class="value green">${{ "%.2f"|format(month_amount_collected) }}</div>
+            </div>
+            <div class="stat">
+                <div class="label">Collection Rate</div>
+                <div class="value">{{ collection_rate }}%</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Unpaid Invoices</h2>
+            {% if recent %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Reminders</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inv in recent %}
+                    <tr>
+                        <td style="font-family:monospace;font-size:12px;">{{ inv.stripe_invoice_id }}</td>
+                        <td>{{ inv.customer_name or inv.customer_email or '—' }}</td>
+                        <td>${{ "%.2f"|format(inv.amount / 100) }}</td>
+                        <td>
+                            {% if inv.status == 'overdue' %}
+                                <span class="badge badge-overdue">Overdue</span>
+                            {% else %}
+                                <span class="badge badge-open">Open</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ inv.reminders_sent }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty"><p>No unpaid invoices yet. Once you connect Stripe, they'll show up here automatically.</p></div>
+            {% endif %}
+        </div>
+
+        {% if collected %}
+        <div class="section">
+            <h2>Recently Collected</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Reminders to Collect</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inv in collected %}
+                    <tr>
+                        <td style="font-family:monospace;font-size:12px;">{{ inv.stripe_invoice_id }}</td>
+                        <td>{{ inv.customer_name or inv.customer_email or '—' }}</td>
+                        <td>${{ "%.2f"|format(inv.amount / 100) }}</td>
+                        <td><span class="badge badge-collected">{{ inv.reminders_sent }} reminders</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

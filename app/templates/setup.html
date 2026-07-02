@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Stripe — PaidUp</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e4e4e7; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .card { background: #1a1d27; padding: 40px; border-radius: 12px; border: 1px solid #262a36; width: 100%; max-width: 500px; }
+        .card h1 { font-size: 22px; margin-bottom: 8px; }
+        .card p { color: #a1a1aa; font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+        .steps { background: #0f1117; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 13px; color: #a1a1aa; }
+        .steps ol { padding-left: 18px; }
+        .steps li { margin-bottom: 8px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #a1a1aa; }
+        input { width: 100%; padding: 10px 12px; background: #0f1117; border: 1px solid #333; border-radius: 6px; color: #e4e4e7; font-size: 14px; margin-bottom: 16px; font-family: monospace; }
+        input:focus { outline: none; border-color: #22c55e; }
+        button { width: 100%; padding: 12px; background: #22c55e; color: #0f1117; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        button:hover { background: #16a34a; }
+        .note { font-size: 12px; color: #52525b; margin-top: 12px; text-align: center; }
+        .note a { color: #22c55e; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Connect Your Stripe Account</h1>
+        <p>PaidUp needs to watch your Stripe invoices. It only takes 30 seconds.</p>
+        
+        <div class="steps">
+            <ol>
+                <li>Go to your <a href="https://dashboard.stripe.com/apikeys" target="_blank" style="color:#22c55e;">Stripe API Keys</a> page</li>
+                <li>Copy your <strong>Secret Key</strong> (starts with <code>sk_live_</code> or <code>sk_test_</code>)</li>
+                <li>Paste it below</li>
+            </ol>
+        </div>
+
+        <form method="post">
+            <label>Stripe Secret Key</label>
+            <input type="text" name="api_key" required placeholder="sk_live_...">
+            <button type="submit">Connect Stripe</button>
+        </form>
+        <div class="note">Your key is encrypted at rest. We only use it to watch invoices and register webhooks. <a href="/dashboard">Skip for now →</a></div>
+    </div>
+</body>
+</html>
