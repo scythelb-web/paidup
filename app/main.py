@@ -62,6 +62,6 @@ async def test_email():
         body_html="""<h2>Your PaidUp invoice reminders are configured!</h2>
         <p>This confirms that SendGrid is wired up and sending correctly.</p>
         <p>Your customers will now receive automated invoice follow-ups.</p>
-        <p style="color:#888;font-size:12px;">Sent from PaidUp — automated invoice follow-up</p>""",
+        <p style="color:#888;font-size:12px;">Sent from PaidUp -- automated invoice follow-up</p>""",
     )
     return {"status": "ok" if result.get("sent") else "error", **result, "to": ADMIN_EMAIL}
