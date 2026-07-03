@@ -43,6 +43,7 @@ async def health():
         "status": "ok",
         "service": "PaidUp",
         "sendgrid_configured": bool(SENDGRID_API_KEY),
+        "version": "6f8a769",
     }
 
 
