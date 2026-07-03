@@ -76,4 +76,7 @@ def send_reminder_email_debug(
             "headers": dict(response.headers),
         }
     except Exception as e:
-        return {"sent": False, "error": str(e)}
+        import traceback
+        tb = traceback.format_exc()
+        logger.error("SendGrid send failed:\n%s", tb)
+        return {"sent": False, "error": str(e), "traceback": tb[-2000:]}
