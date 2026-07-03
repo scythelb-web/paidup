@@ -39,13 +39,11 @@ async def landing(request: Request):
 @app.get("/health")
 async def health():
     from app.config import SENDGRID_API_KEY
-    import sendgrid
     return {
         "status": "ok",
         "service": "PaidUp",
         "sendgrid_configured": bool(SENDGRID_API_KEY),
-        "version": "6f8a769",
-        "sendgrid_version": sendgrid.__version__,
+        "version": "4309ec8",
     }
 
 
