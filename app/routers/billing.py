@@ -10,9 +10,9 @@ from app.database import get_db
 router = APIRouter(prefix="/billing", tags=["billing"])
 
 PRICE_IDS = {
-    "starter": "price_REPLACE_paidup_starter",
-    "growth": "price_REPLACE_paidup_growth",
-    "scale": "price_REPLACE_paidup_scale",
+    "starter": None,  # free plan
+    "growth": "price_1Tr3FHIh3bqeW0wSUP5Mlh3y",
+    "scale": "price_1Tr3FaIh3bqeW0wSTVG7ENko",
 }
 
 
@@ -32,6 +32,12 @@ async def create_checkout(request: Request, plan: str = Form(...)):
 
     if plan not in PRICE_IDS:
         return render(request, "pricing.html", {"user": user, "selected": plan, "error": "Invalid plan selected"})
+
+    # Free plan — no Stripe checkout needed
+    if PRICE_IDS[plan] is None:
+        with get_db() as db:
+            db.execute("UPDATE users SET plan = 'starter', stripe_subscription_id = NULL WHERE id = ?", (user["id"],))
+        return RedirectResponse("/dashboard?plan=starter", status_code=303)
 
     import stripe as _stripe
     _stripe.api_key = STRIPE_SECRET_KEY
