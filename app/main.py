@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 from app.database import init_db
-from app.routers import auth, webhooks, dashboard
+from app.routers import auth, webhooks, dashboard, billing
 from app.templates import render
 
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +23,7 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 app.include_router(auth.router)
 app.include_router(webhooks.router)
 app.include_router(dashboard.router)
+app.include_router(billing.router)
 
 
 @app.on_event("startup")

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaidUp — Pricing</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #1a1a2e; }
+        .nav { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: #4a6cf7; text-decoration: none; font-weight: 500; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+        h1 { text-align: center; font-size: 2.25rem; margin-bottom: 8px; }
+        .subtitle { text-align: center; color: #64748b; margin-bottom: 40px; font-size: 1.1rem; }
+        .error { background: #fee2e2; color: #991b1b; padding: 12px 20px; border-radius: 8px; margin-bottom: 24px; text-align: center; }
+        .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        @media (max-width: 768px) { .tiers { grid-template-columns: 1fr; } }
+        .tier { background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; padding: 32px 24px; text-align: center; transition: transform 0.2s, border-color 0.2s; }
+        .tier:hover { transform: translateY(-4px); }
+        .tier.current { border-color: #4a6cf7; }
+        .tier.featured { border-color: #4a6cf7; box-shadow: 0 4px 24px rgba(74,108,247,0.15); }
+        .tier-name { font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; }
+        .tier-price { font-size: 2.5rem; font-weight: 800; margin: 16px 0 4px; }
+        .tier-price span { font-size: 1rem; font-weight: 400; color: #64748b; }
+        .tier-desc { color: #64748b; font-size: 0.9rem; margin-bottom: 24px; }
+        .features { list-style: none; text-align: left; margin-bottom: 28px; }
+        .features li { padding: 8px 0; color: #475569; font-size: 0.925rem; }
+        .features li::before { content: '✓ '; color: #22c55e; font-weight: bold; }
+        .btn { display: inline-block; padding: 12px 32px; border-radius: 8px; font-size: 1rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; width: 100%; }
+        .btn-primary { background: #4a6cf7; color: #fff; }
+        .btn-primary:hover { background: #3651d4; }
+        .btn-outline { background: transparent; border: 2px solid #4a6cf7; color: #4a6cf7; }
+        .btn-outline:hover { background: #4a6cf7; color: #fff; }
+        .btn-disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+        .badge { display: inline-block; background: #4a6cf7; color: #fff; font-size: 0.75rem; padding: 2px 10px; border-radius: 20px; margin-bottom: 12px; }
+        .portal-link { text-align: center; margin-top: 24px; }
+        .portal-link a { color: #4a6cf7; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="/"><strong>PaidUp</strong></a>
+        <div>
+            <a href="/dashboard">Dashboard</a>
+            &nbsp;&nbsp;
+            <a href="/auth/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Choose your plan</h1>
+        <p class="subtitle">Start free. Upgrade when you're ready to grow.</p>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if request.query_params.get('cancelled') %}
+        <div class="error" style="background:#fef3c7;color:#92400e;">Checkout was cancelled. You can try again anytime.</div>
+        {% endif %}
+
+        <div class="tiers">
+            <!-- Free Tier -->
+            <div class="tier {% if user.plan == 'free' %}current{% endif %}">
+                <div class="tier-name">Free</div>
+                <div class="tier-price">$0<span>/mo</span></div>
+                <p class="tier-desc">Get started with basic follow-ups</p>
+                <ul class="features">
+                    <li>Track up to 10 invoices</li>
+                    <li>Basic email follow-ups</li>
+                    <li>Standard sequence</li>
+                    <li>Email support</li>
+                </ul>
+                {% if user.plan == 'free' %}
+                <div class="btn btn-disabled">Current Plan</div>
+                {% else %}
+                <div class="btn btn-disabled">Downgrade via portal</div>
+                {% endif %}
+            </div>
+
+            <!-- Growth Tier -->
+            <div class="tier featured {% if user.plan == 'growth' %}current{% endif %}">
+                {% if user.plan != 'growth' %}<div class="badge">Popular</div>{% endif %}
+                <div class="tier-name">Growth</div>
+                <div class="tier-price">$49<span>/mo</span></div>
+                <p class="tier-desc">For growing businesses</p>
+                <ul class="features">
+                    <li>Track up to 100 invoices</li>
+                    <li>Custom follow-up sequences</li>
+                    <li>Priority email delivery</li>
+                    <li>Analytics dashboard</li>
+                    <li>Chat support</li>
+                </ul>
+                {% if user.plan == 'growth' %}
+                <div class="btn btn-disabled">Current Plan</div>
+                {% else %}
+                <form method="post" action="/billing/checkout">
+                    <input type="hidden" name="plan" value="growth">
+                    <button type="submit" class="btn btn-primary">Upgrade to Growth</button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Scale Tier -->
+            <div class="tier {% if user.plan == 'scale' %}current{% endif %}">
+                <div class="tier-name">Scale</div>
+                <div class="tier-price">$149<span>/mo</span></div>
+                <p class="tier-desc">For high-volume operations</p>
+                <ul class="features">
+                    <li>Unlimited invoices</li>
+                    <li>Fully custom sequences</li>
+                    <li>Dedicated IP &amp; delivery</li>
+                    <li>Advanced analytics</li>
+                    <li>Priority support</li>
+                    <li>API access</li>
+                </ul>
+                {% if user.plan == 'scale' %}
+                <div class="btn btn-disabled">Current Plan</div>
+                {% else %}
+                <form method="post" action="/billing/checkout">
+                    <input type="hidden" name="plan" value="scale">
+                    <button type="submit" class="btn btn-primary">Upgrade to Scale</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if user.plan != 'free' %}
+        <div class="portal-link">
+            <a href="/billing/portal">Manage your subscription →</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

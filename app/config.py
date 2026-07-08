@@ -7,6 +7,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./paidup.db")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "scythelb@gmail.com")
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 

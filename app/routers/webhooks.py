@@ -38,6 +38,10 @@ async def stripe_webhook(request: Request):
         await handle_invoice_paid(obj)
     elif event_type in ("invoice.created", "invoice.finalized"):
         await handle_invoice_created(obj)
+    elif event_type == "checkout.session.completed":
+        await handle_checkout_completed(event["data"]["object"])
+    elif event_type == "customer.subscription.deleted":
+        await handle_subscription_deleted(event["data"]["object"])
 
     return {"status": "ok"}
 
@@ -295,3 +299,34 @@ async def setup_save(request: Request, api_key: str = Form(...)):
     register_webhook(api_key, f"{BASE_URL}/stripe/webhook")
 
     return RedirectResponse("/dashboard?setup=done", status_code=303)
+
+
+# --- Subscription / Checkout Handlers ---
+
+async def handle_checkout_completed(session: dict):
+    customer_id = session.get("customer")
+    subscription_id = session.get("subscription")
+    if not customer_id or not subscription_id:
+        return
+    with get_db() as db:
+        user = db.execute("SELECT * FROM users WHERE stripe_customer_id = ?", (customer_id,)).fetchone()
+        if not user:
+            return
+        from app.config import STRIPE_SECRET_KEY
+        try:
+            import stripe as _stripe
+            _stripe.api_key = STRIPE_SECRET_KEY
+            sub = _stripe.Subscription.retrieve(subscription_id)
+            plan = "growth"
+            for k, v in {"starter": 0, "growth": 4900, "scale": 14900}.items():
+                if sub["items"]["data"][0]["price"].get("unit_amount") == v:
+                    plan = k
+        except Exception:
+            plan = "growth"
+        db.execute("UPDATE users SET stripe_subscription_id = ?, plan = ? WHERE id = ?", (subscription_id, plan, user["id"]))
+
+
+async def handle_subscription_deleted(subscription: dict):
+    if subscription.get("id"):
+        with get_db() as db:
+            db.execute("UPDATE users SET plan = 'free', stripe_subscription_id = NULL WHERE stripe_subscription_id = ?", (subscription["id"],))
